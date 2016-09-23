@@ -254,3 +254,13 @@ Robobinding是基于APT的，所以性能上面不会差到哪里去，
 
 由于是基于XML，有一些控件的动作还是需要 findViewById出来后再设置
 
+
+
+
+
+
+
+http://robobinding.github.io/RoboBinding/getting_started.zh.html#_android_studio[getting started_zh]
+http://martinfowler.com/eaaDev/PresentationModel.html[PresentationModel]
+
+
