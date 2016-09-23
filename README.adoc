@@ -3,3 +3,254 @@
 An android app to showcase the usage of https://github.com/RoboBinding/RoboBinding[RoboBinding] framework.
 
 The project can be directly imported into Android Studio.
+
+
+Robobinding是基于Presentation Model提出的一个数据绑定框架。PresentationModel是由Martin Fowler提出的一个软件模型。
+
+通过PresentationModel对model与view层进行解耦。robobingding基于apt代码生成来运作。APT的好处是代码都在编译时动态生成，省去了反射问题，坏处是会增加代码。
+
+PresentationModel的声明比较简单
+
+@org.robobinding.annotation.PresentationModel
+public class XXXX implements HasPresentationModelChangeSupport {
+
+便可。
+
+最后会在build/generated/source/apt/{buildType}/{packageName}下找到对应对象生成的java类，最后会$$PM结尾。从这个PM文件看结构来推测生成规则。
+
+@org.robobinding.annotation.PresentationModel
+public class PresentationModel implements HasPresentationModelChangeSupport {
+    private PresentationModelChangeSupport changeSupport;
+    private String name;
+
+    public PresentationModel() {
+        changeSupport = new PresentationModelChangeSupport(this);
+    }
+
+    public String getHello() {
+        return "hello," + name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void sayHello() {
+        changeSupport.firePropertyChange("hello");
+    }
+
+    public void triggerOk() {
+        Log.e("demonk", "OK");
+    }
+
+    public PresentationModelChangeSupport getPresentationModelChangeSupport() {
+        return changeSupport;
+    }
+}
+这是官方的AndroidMVVM的一个基本样子，最后生成出来的类为
+
+public class PresentationModel$$PM
+    extends AbstractPresentationModelObject
+{
+    final PresentationModel presentationModel;
+
+    public PresentationModel$$PM(PresentationModel presentationModel) {
+        super(presentationModel);
+        this.presentationModel = presentationModel;
+    }
+
+    @Override
+    public Set<String> propertyNames() {
+        return Sets.newHashSet("hello", "name");
+    }
+
+    @Override
+    public Set<String> dataSetPropertyNames() {
+        return Sets.newHashSet();
+    }
+
+    @Override
+    public Set<MethodDescriptor> eventMethods() {
+        return Sets.newHashSet(createMethodDescriptor("sayHello"), createMethodDescriptor("triggerOk"));
+    }
+
+    @Override
+    public Map<String, Set<String>> propertyDependencies() {
+        Map<String, Set<String>> dependencies = Maps.newHashMap();
+        return dependencies;
+    }
+
+    @Override
+    public SimpleProperty tryToCreateProperty(String name) {
+        if (name.equals("hello")) {
+            PropertyDescriptor descriptor = createPropertyDescriptor(String.class, name, true, false);
+            AbstractGetSet<?> getSet = new AbstractGetSet<String>(descriptor) {
+
+                @Override
+                public String getValue() {
+                    return presentationModel.getHello();
+                }
+            }
+            ;
+            return new SimpleProperty(this, descriptor, getSet);
+        }
+        if (name.equals("name")) {
+            PropertyDescriptor descriptor = createPropertyDescriptor(String.class, name, true, true);
+            AbstractGetSet<?> getSet = new AbstractGetSet<String>(descriptor) {
+
+                @Override
+                public String getValue() {
+                    return presentationModel.getName();
+                }
+
+                @Override
+                public void setValue(String newValue) {
+                    presentationModel.setName(newValue);
+                }
+            }
+            ;
+            return new SimpleProperty(this, descriptor, getSet);
+        }
+        return null;
+    }
+
+    @Override
+    public DataSetProperty tryToCreateDataSetProperty(String name) {
+        return null;
+    }
+
+    @Override
+    public Function tryToCreateFunction(MethodDescriptor methodDescriptor) {
+        if (methodDescriptor.equals(createMethodDescriptor("sayHello"))) {
+            return new Function() {
+
+                @Override
+                public Object call(Object... args) {
+                    presentationModel.sayHello();
+                    return null;
+                }
+            }
+            ;
+        }
+        if (methodDescriptor.equals(createMethodDescriptor("triggerOk"))) {
+            return new Function() {
+
+                @Override
+                public Object call(Object... args) {
+                    presentationModel.triggerOk();
+                    return null;
+                }
+            }
+            ;
+        }
+        return null;
+    }
+}
+
+生成的方法列表如下：
+
+propertyNames
+这个表示我们写的PM类当中的property名字集合，如有setHello，getName等，方法名会被识别为小驼峰，驼峰处会识别成名字，这点与gradle是一样的，在sample中，"hello"与"name"就被识别出来，这个name被识别出来会重新设置为小驼峰样式
+
+dataSetPropertyNames
+          使用了@ItemPresentationModel 标记的Property，一般用于Adapter绑定数据用的
+
+eventMethods
+可能会被触发的方法，有参数也可以，会在createMethodDescriptor时带入
+
+propertyDependencies
+          Property需要依赖另一个Property时用，一般使用@DependsOnStateOf 声明，可以声明多个
+
+tryToCreateProperty
+创建一个Property的Descriptor对象，对于一个特定的propertyName，如果PM中设置了set与get方法，则其调用也会在这里生成，在获取propertyName的值时使用get，在设置时使用set
+
+tryToCreateDataSetProperty
+          用于创建DataSet的Property对象的
+
+tryToCreateFunction
+创建一个方法的Descriptor对象，以方法名区分，最后会调用到PM中定义的方法
+
+对应的layout如下：
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Hello World!"
+    bind:text="{hello}" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name:" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        bind:text="${name}" />
+</LinearLayout>
+
+<Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Say Hello"
+    bind:onClick="sayHello" />
+
+对于TextView，bind:text指定了使用"hello"这个property的值，实际上调用的是getHello()，当"hello"发生改变时使用
+firePropertyChange("hello")
+
+通知关注"hello"的对象发生了改变，对应textView重新调用了getHello来改变text。这是一个单向绑定。
+
+EditText里绑定了"name"这个propertyName，这是一个双向绑定，双向绑定需要UI控件支持。同样在PM中也需要设置一个对应的set方法。
+
+双向绑定：
+UI里发生改变，set方法会被调用；
+值发生了改变，使用firePropertyChange，对应的get方法会被调用，UI会被更新
+
+//////总结
+Robobinding是基于APT的，所以性能上面不会差到哪里去，
+
+使用的几个概念
+
+- Property
+
+    - 一般的Property，为常见的类型
+    - DataSetProperty，一般用于Adapter的Property
+
+    - 不同的Property允许存在依赖（@DependsOnStateOf）
+- Descriptor
+
+    - 描述Property的PropertyDescriptor
+
+    - 描述Method的MethodDescriptor
+
+    - 描述DataSet的DataSetDescriptor
+
+- 绑定
+
+    - 单向绑定
+
+    - 双向绑定
+    - AbstractGetSet为对应的Property设置 getter与setter
+
+    - 是XML（包括布局与MENU等）与ProsentationModel之间的绑定
+
+分几个场景
+
+- 文本，按钮
+
+- 列表
+
+对于列表数据，其不管数据的来源是在哪里，数据的加工在PM中进行（如数组，Cursor等）
+
+可以通过组合的方式将不同的组成PM关系链，一般一个XML与一个PM对应 绑定
+
+由于是基于XML，有一些控件的动作还是需要 findViewById出来后再设置
+
