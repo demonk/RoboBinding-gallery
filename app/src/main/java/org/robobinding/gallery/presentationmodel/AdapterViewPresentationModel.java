@@ -1,7 +1,5 @@
 package org.robobinding.gallery.presentationmodel;
 
-import java.util.List;
-
 import org.robobinding.annotation.DependsOnStateOf;
 import org.robobinding.annotation.ItemPresentationModel;
 import org.robobinding.annotation.PresentationModel;
@@ -10,6 +8,8 @@ import org.robobinding.gallery.model.adapterview.SampleStringType;
 import org.robobinding.gallery.model.adapterview.SampleStrings;
 import org.robobinding.gallery.model.adapterview.StringItemLayout;
 import org.robobinding.itempresentationmodel.ViewTypeSelectionContext;
+
+import java.util.List;
 
 /**
  * @author Cheng Wei
@@ -33,7 +33,7 @@ public class AdapterViewPresentationModel implements PublicMethodInvocationLog {
     }
 
     @ItemPresentationModel(value = StringItemPresentationModel.class)
-    @DependsOnStateOf(SELECTED_SOURCE_INDEX)
+    @DependsOnStateOf(SELECTED_SOURCE_INDEX)//表示依赖于selectedSourceIndex这个Property,会调用到getSelectedSourceIndex,依赖的Property必须有值才行
     public List<String> getDynamicStrings() {
         return getSelectedSource().getSample();
     }

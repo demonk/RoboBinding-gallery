@@ -5,7 +5,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import org.robobinding.gallery.R;
-import org.robobinding.gallery.presentationmodel.ListViewPresentationModel;
 import org.robobinding.gallery.presentationmodel.RecyclerViewPresentationModel;
 
 /**
@@ -23,6 +22,7 @@ public class RecyclerViewActivity extends AbstractActivity {
 
 	    presentationModel = new RecyclerViewPresentationModel();
 	    initializeContentView(R.layout.activity_recycler_view, presentationModel);
+
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }

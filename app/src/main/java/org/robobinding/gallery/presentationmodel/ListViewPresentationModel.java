@@ -15,7 +15,7 @@
  */
 package org.robobinding.gallery.presentationmodel;
 
-import java.util.List;
+import android.util.SparseBooleanArray;
 
 import org.robobinding.annotation.DependsOnStateOf;
 import org.robobinding.annotation.ItemPresentationModel;
@@ -29,7 +29,7 @@ import org.robobinding.gallery.model.view.IntegerVisibility;
 import org.robobinding.presentationmodel.HasPresentationModelChangeSupport;
 import org.robobinding.presentationmodel.PresentationModelChangeSupport;
 
-import android.util.SparseBooleanArray;
+import java.util.List;
 
 /**
  * @author Cheng Wei
@@ -62,6 +62,7 @@ public class ListViewPresentationModel implements HasPresentationModelChangeSupp
         checkedItemPosition = 0;
     }
 
+    //每个item指定一个PM，用于获取name
     @ItemPresentationModel(value = StringItemPresentationModel.class)
     public List<String> getStrings() {
         return SampleStrings.getSample();

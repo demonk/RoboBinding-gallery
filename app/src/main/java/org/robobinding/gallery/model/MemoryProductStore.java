@@ -21,7 +21,8 @@ public class MemoryProductStore {
     public void reset() {
 	this.products = TestData.products();
     }
-    
+
+    //构建一系列的Product,Product只是一个POJO
     public List<Product> getAll() {
 	return Collections.unmodifiableList(products);
     }

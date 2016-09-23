@@ -1,6 +1,7 @@
 package org.robobinding.gallery.presentationmodel;
 
-import java.util.List;
+import android.app.Activity;
+import android.content.Intent;
 
 import org.robobinding.annotation.ItemPresentationModel;
 import org.robobinding.annotation.PresentationModel;
@@ -9,8 +10,7 @@ import org.robobinding.gallery.activity.ViewPagerActivity;
 import org.robobinding.gallery.model.Product;
 import org.robobinding.widget.adapterview.ItemClickEvent;
 
-import android.app.Activity;
-import android.content.Intent;
+import java.util.List;
 
 /**
  * @author Cheng Wei
@@ -27,7 +27,8 @@ public class ListFragmentDemoPresentationModel {
         this.products = products;
     }
 
-    @ItemPresentationModel(value = ToStringItemPresentationModel.class)
+    //只是用于一般的list而已，只不过ITEM的模板是用于Product
+    @ItemPresentationModel(value = ToStringItemPresentationModel.class)//value=Product的name
     public List<Product> getProducts() {
         return products;
     }

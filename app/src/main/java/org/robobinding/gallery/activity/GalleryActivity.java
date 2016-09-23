@@ -1,14 +1,14 @@
 package org.robobinding.gallery.activity;
 
-import java.util.Map;
-
-import org.robobinding.gallery.R;
-import org.robobinding.gallery.presentationmodel.GalleryPresentationModel;
-
 import android.app.Activity;
 import android.os.Bundle;
 
 import com.google.common.collect.Maps;
+
+import org.robobinding.gallery.R;
+import org.robobinding.gallery.presentationmodel.GalleryPresentationModel;
+
+import java.util.Map;
 
 /**
  * 
@@ -31,7 +31,7 @@ public class GalleryActivity extends AbstractActivity {
 	demoActivityMappings.put("TypedCursor", TypedCursorActivity.class);
 	demoActivityMappings.put("Fragment & ViewPager", ListFragmentDemoActivity.class);
 	demoActivityMappings.put("Options Menu", OptionsMenuActivity.class);
-	demoActivityMappings.put("Context Menu", ContextMenuDemoActivity.class);
+	demoActivityMappings.put("Context Menu", ContextMenuDemoActivity.class);//上下文菜单 ，就是长按菜单
 	demoActivityMappings.put("Contextual Action Mode", ContextualActionModeActivity.class);
 
 	GalleryPresentationModel presentationModel = new GalleryPresentationModel(this, demoActivityMappings);
